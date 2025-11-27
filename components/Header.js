@@ -32,6 +32,13 @@ export default function Header() {
           <Link href="/register" className="text-blue-600">Register</Link>
         </>}
         {user && <>
+          {/* Dashboard link for jobseeker or employer */}
+          {(user.role === "jobseeker") && (
+            <Link href="/jobseeker/dashboard" className="text-blue-600">Dashboard</Link>
+          )}
+          {(user.role === "employer") && (
+            <Link href="/employer/dashboard" className="text-blue-600">Dashboard</Link>
+          )}
           <span className="text-gray-700">{user.name} ({user.role})</span>
           <button className="text-red-600" onClick={signOut}>Logout</button>
         </>}

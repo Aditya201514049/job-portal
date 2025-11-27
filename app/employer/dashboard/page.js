@@ -58,6 +58,11 @@ export default function EmployerDashboard() {
   const [msg, setMsg] = useState(null);
   const [applicants, setApplicants] = useState({});
 
+  // Guard: Wait for user and token to load
+  if (!user || !token) {
+    return <main className="max-w-2xl mx-auto p-4"><div>Loading...</div></main>;
+  }
+
   const fetchJobs = async () => {
     setLoading(true);
     const { data, ok } = await apiFetch("/api/employer/jobs", { token });
