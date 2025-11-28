@@ -22,8 +22,10 @@ export async function PUT(request) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
-    const employerId = searchParams.get("id");
+    const requestUrl = new URL(request.url);
+    const employerId =
+      requestUrl.searchParams.get("id") ||
+      requestUrl.pathname.split("/").filter(Boolean).pop();
     const { action } = await request.json();
 
     if (!employerId || !action) {

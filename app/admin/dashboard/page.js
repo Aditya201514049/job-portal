@@ -37,7 +37,11 @@ export default function AdminDashboard() {
   }, [token]);
 
   const handleApprove = async (employerId) => {
-    const res = await apiFetch(`/api/admin/employers/${employerId}`, { method: "PUT", token, body: { isApproved: true } });
+    const res = await apiFetch(`/api/admin/employers/${employerId}?id=${employerId}`, {
+      method: "PUT",
+      token,
+      body: { action: "approve" },
+    });
     if (res.status === 200) {
       setMsg("Employer approved.");
       setPendingEmployers(pendingEmployers.filter(e => e._id !== employerId));
@@ -47,7 +51,11 @@ export default function AdminDashboard() {
   };
 
   const handleReject = async (employerId) => {
-    const res = await apiFetch(`/api/admin/employers/${employerId}`, { method: "PUT", token, body: { isApproved: false } });
+    const res = await apiFetch(`/api/admin/employers/${employerId}?id=${employerId}`, {
+      method: "PUT",
+      token,
+      body: { action: "reject" },
+    });
     if (res.status === 200) {
       setMsg("Employer rejected.");
       setPendingEmployers(pendingEmployers.filter(e => e._id !== employerId));
