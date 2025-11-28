@@ -49,39 +49,55 @@ export default function JobSeekerDashboard() {
   };
 
   return (
-    <main className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Jobseeker Dashboard</h1>
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-2">Edit Profile</h2>
-        <form onSubmit={handleProfileSave} className="space-y-2">
-          <label className="block">Bio
-            <textarea name="bio" className="w-full border rounded p-2" value={profile.bio} onChange={handleProfileChange} />
+    <main className="space-y-8">
+      <section className="glass-panel">
+        <h1 className="text-2xl font-bold mb-1">Jobseeker Dashboard</h1>
+        <p className="muted">Keep your profile fresh and track every application in one place.</p>
+      </section>
+
+      <section className="glass-panel space-y-4">
+        <h2 className="section-title">Profile & Resume</h2>
+        <form onSubmit={handleProfileSave} className="space-y-4">
+          <label className="block text-sm font-medium">
+            Bio
+            <textarea name="bio" className="input mt-1 h-28 resize-none" value={profile.bio} onChange={handleProfileChange} />
           </label>
-          <label className="block">Skills (comma separated)
-            <input name="skills" className="w-full border rounded p-2" value={profile.skills} onChange={handleProfileChange} />
+          <label className="block text-sm font-medium">
+            Skills (comma separated)
+            <input name="skills" className="input mt-1" value={profile.skills} onChange={handleProfileChange} />
           </label>
-          <label className="block">Resume URL
-            <input name="resumeURL" className="w-full border rounded p-2" value={profile.resumeURL} onChange={handleProfileChange} />
+          <label className="block text-sm font-medium">
+            Resume URL
+            <input name="resumeURL" className="input mt-1" value={profile.resumeURL} onChange={handleProfileChange} />
           </label>
-          <button className="bg-blue-600 text-white py-2 px-4 rounded" type="submit">Save Profile</button>
-          {profileMsg && <div className="text-green-700 mt-1">{profileMsg}</div>}
+          <button className="btn btn-primary" type="submit">Save profile</button>
+          {profileMsg && <div className="text-green-700">{profileMsg}</div>}
         </form>
       </section>
-      <section>
-        <h2 className="text-lg font-semibold mb-2">Applied Jobs</h2>
-        {loading && <div>Loading...</div>}
+
+      <section className="glass-panel space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="section-title">Applied roles</h2>
+          <span className="subtle">{applied.length} submissions</span>
+        </div>
+        {loading && <div className="muted">Loading applications...</div>}
         {error && <div className="text-red-600">{error}</div>}
-        <ul className="space-y-3">
+        <div className="card-stack">
           {applied.map(app => (
-            <li key={app._id} className="border rounded p-3">
-              <div className="font-semibold">{app.jobId?.title}</div>
-              <div className="text-gray-700">{app.jobId?.company} - {app.jobId?.location}</div>
-              <div className="text-gray-500">{app.jobId?.jobType} | {app.jobId?.salaryRange}</div>
-              <div className="text-sm mt-1">{app.jobId?.description?.slice(0, 80)}...</div>
-            </li>
+            <div key={app._id} className="card">
+              <div className="flex justify-between gap-4 flex-wrap">
+                <div>
+                  <h3 className="text-lg font-semibold">{app.jobId?.title}</h3>
+                  <p className="muted text-sm">{app.jobId?.company} • {app.jobId?.location}</p>
+                </div>
+                <span className="tag">{app.jobId?.jobType}</span>
+              </div>
+              <p className="muted text-sm mt-3">{app.jobId?.description?.slice(0, 100)}...</p>
+              <div className="text-xs muted mt-3">Applied on {new Date(app.createdAt).toLocaleDateString()}</div>
+            </div>
           ))}
-        </ul>
-        {!loading && applied.length === 0 && <div>No applications yet.</div>}
+        </div>
+        {!loading && applied.length === 0 && <div className="muted">You have not applied to any roles yet.</div>}
       </section>
     </main>
   );

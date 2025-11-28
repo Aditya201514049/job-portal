@@ -23,8 +23,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <Header />
-          {children}
+          <div className="page-shell space-y-4">
+            <Header />
+            <main>{children}</main>
+          </div>
         </AuthProvider>
       </body>
     </html>

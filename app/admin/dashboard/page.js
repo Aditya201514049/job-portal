@@ -65,51 +65,96 @@ export default function AdminDashboard() {
   };
 
   return (
-    <main className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      {msg && <div className="text-green-700 mb-2">{msg}</div>}
-      {loading && <div>Loading data...</div>}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Pending Employers</h2>
-        <ul className="space-y-2">
-          {pendingEmployers.length === 0 && <li>No pending employers.</li>}
-          {pendingEmployers.map(emp => (
-            <li key={emp._id} className="border rounded p-2 flex justify-between items-center">
-              <span>{emp.name} ({emp.email})</span>
-              <div className="flex gap-2">
-                <button className="bg-green-600 text-white px-3 py-1 rounded" onClick={() => handleApprove(emp._id)}>Approve</button>
-                <button className="bg-red-600 text-white px-3 py-1 rounded" onClick={() => handleReject(emp._id)}>Reject</button>
+    <main className="space-y-8">
+      <section className="glass-panel">
+        <h1 className="text-2xl font-bold">Admin Command Center</h1>
+        <p className="muted">Approve employers, watch platform health, and keep the marketplace safe.</p>
+        {msg && <div className="subtle mt-3">{msg}</div>}
+      </section>
+      {loading && <div className="glass-panel muted">Loading insights...</div>}
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="glass-panel">
+          <h2 className="section-title">Pending employers</h2>
+          <div className="space-y-3">
+            {pendingEmployers.length === 0 && <p className="muted">No pending requests.</p>}
+            {pendingEmployers.map(emp => (
+              <div key={emp._id} className="card space-y-2">
+                <div className="font-semibold">{emp.name}</div>
+                <div className="muted text-sm">{emp.email}</div>
+                <div className="flex gap-2">
+                  <button className="btn btn-primary text-sm" onClick={() => handleApprove(emp._id)}>Approve</button>
+                  <button className="btn btn-ghost text-sm" onClick={() => handleReject(emp._id)}>Reject</button>
+                </div>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </div>
+        <div className="glass-panel">
+          <h2 className="section-title">Platform snapshot</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="card">
+              <div className="muted text-sm">Users</div>
+              <div className="text-2xl font-semibold">{users.length}</div>
+            </div>
+            <div className="card">
+              <div className="muted text-sm">Jobs</div>
+              <div className="text-2xl font-semibold">{jobs.length}</div>
+            </div>
+            <div className="card">
+              <div className="muted text-sm">Applications</div>
+              <div className="text-2xl font-semibold">{applications.length}</div>
+            </div>
+            <div className="card">
+              <div className="muted text-sm">Employers pending</div>
+              <div className="text-2xl font-semibold">{pendingEmployers.length}</div>
+            </div>
+          </div>
+        </div>
       </section>
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">All Users</h2>
-        <ul className="space-y-1">
-          {users.length === 0 && <li>No users found.</li>}
+
+      <section className="glass-panel space-y-3">
+        <h2 className="section-title">All users</h2>
+        <div className="card-stack">
           {users.map(u => (
-            <li key={u._id}>{u.name} ({u.email}) - {u.role} {u.isBlocked ? "[Blocked]" : ""}</li>
+            <div key={u._id} className="card flex items-center justify-between">
+              <div>
+                <div className="font-semibold">{u.name}</div>
+                <div className="muted text-sm">{u.email}</div>
+              </div>
+              <span className="tag">{u.role}{u.isBlocked ? " • blocked" : ""}</span>
+            </div>
           ))}
-        </ul>
+          {users.length === 0 && <p className="muted">No users yet.</p>}
+        </div>
       </section>
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">All Jobs</h2>
-        <ul className="space-y-1">
-          {jobs.length === 0 && <li>No jobs found.</li>}
-          {jobs.map(j => (
-            <li key={j._id}>{j.title} at {j.company} ({j.location})</li>
+
+      <section className="glass-panel space-y-3">
+        <h2 className="section-title">Jobs overview</h2>
+        <div className="card-stack">
+          {jobs.map(job => (
+            <div key={job._id} className="card flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <div className="font-semibold">{job.title}</div>
+                <div className="muted text-sm">{job.company} • {job.location}</div>
+              </div>
+              <span className="tag">{job.jobType}</span>
+            </div>
           ))}
-        </ul>
+          {jobs.length === 0 && <p className="muted">No jobs yet.</p>}
+        </div>
       </section>
-      <section>
-        <h2 className="text-xl font-semibold mb-2">All Applications</h2>
-        <ul className="space-y-1">
-          {applications.length === 0 && <li>No applications found.</li>}
-          {applications.map(a => (
-            <li key={a._id}>Job: {a.jobId?.title} | Applicant: {a.jobSeekerId?.name} ({a.jobSeekerId?.email})</li>
+
+      <section className="glass-panel space-y-3">
+        <h2 className="section-title">Recent applications</h2>
+        <div className="card-stack">
+          {applications.map(app => (
+            <div key={app._id} className="card">
+              <div className="font-semibold">{app.jobId?.title}</div>
+              <p className="muted text-sm">Applicant: {app.jobSeekerId?.name} ({app.jobSeekerId?.email})</p>
+            </div>
           ))}
-        </ul>
+          {applications.length === 0 && <p className="muted">No applications submitted yet.</p>}
+        </div>
       </section>
     </main>
   );

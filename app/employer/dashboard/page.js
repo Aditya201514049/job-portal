@@ -29,21 +29,21 @@ function JobForm({ onSave, initial = {}, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 border p-4 rounded mb-4">
-      <input name="title" className="w-full border p-2 rounded" placeholder="Title" value={form.title} onChange={handleChange} />
-      <input name="company" className="w-full border p-2 rounded" placeholder="Company" value={form.company} onChange={handleChange} />
-      <input name="location" className="w-full border p-2 rounded" placeholder="Location" value={form.location} onChange={handleChange} />
-      <select name="jobType" className="w-full border p-2 rounded" value={form.jobType} onChange={handleChange}>
+    <form onSubmit={handleSubmit} className="glass-panel space-y-3">
+      <input name="title" className="input" placeholder="Role title" value={form.title} onChange={handleChange} />
+      <input name="company" className="input" placeholder="Company" value={form.company} onChange={handleChange} />
+      <input name="location" className="input" placeholder="Location" value={form.location} onChange={handleChange} />
+      <select name="jobType" className="input" value={form.jobType} onChange={handleChange}>
         <option value="Full-time">Full-time</option>
         <option value="Part-time">Part-time</option>
         <option value="Remote">Remote</option>
       </select>
-      <input name="salaryRange" className="w-full border p-2 rounded" placeholder="Salary Range" value={form.salaryRange} onChange={handleChange} />
-      <textarea name="description" className="w-full border p-2 rounded" placeholder="Description" value={form.description} onChange={handleChange} />
+      <input name="salaryRange" className="input" placeholder="Salary range" value={form.salaryRange} onChange={handleChange} />
+      <textarea name="description" className="input" placeholder="Role description" value={form.description} onChange={handleChange} />
       {error && <div className="text-red-600">{error}</div>}
       <div className="flex gap-2">
-        <button className="bg-blue-600 text-white py-1 px-4 rounded" type="submit">Save</button>
-        {onCancel && <button className="bg-gray-300 py-1 px-4 rounded" type="button" onClick={onCancel}>Cancel</button>}
+        <button className="btn btn-primary" type="submit">Save</button>
+        {onCancel && <button className="btn btn-ghost" type="button" onClick={onCancel}>Cancel</button>}
       </div>
     </form>
   );
@@ -106,46 +106,71 @@ export default function EmployerDashboard() {
   };
 
   return (
-    <main className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Employer Dashboard</h1>
-      <button className="bg-green-600 text-white py-2 px-4 rounded mb-4" onClick={() => { setShowForm(!showForm); setEditing(null); }}>
-        {showForm ? "Hide" : "Create New Job"}
-      </button>
+    <main className="space-y-8">
+      <section className="glass-panel flex flex-col gap-3">
+        <h1 className="text-2xl font-bold">Employer Workspace</h1>
+        <p className="muted">Create openings, manage applicants, and keep your listings up to date.</p>
+        <div className="flex gap-3 flex-wrap">
+          <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); setEditing(null); }}>
+            {showForm ? "Close form" : "Create new job"}
+          </button>
+          {msg && <span className="subtle">{msg}</span>}
+        </div>
+      </section>
       {showForm && <JobForm onSave={handleCreate} onCancel={() => setShowForm(false)} />}
-      {editing && <JobForm initial={editing} onSave={handleEdit} onCancel={() => setEditing(null)} />}
-      {msg && <div className="text-green-700 mb-2">{msg}</div>}
-      {loading && <div>Loading jobs...</div>}
-      <ul className="space-y-4">
-        {jobs.map(job => (
-          <li key={job._id} className="border rounded p-4">
-            <div className="font-semibold text-lg">{job.title}</div>
-            <div className="text-gray-700">{job.company} - {job.location}</div>
-            <div className="text-gray-500">{job.jobType} | {job.salaryRange}</div>
-            <div className="mt-2 text-sm">{job.description?.slice(0, 100)}...</div>
-            <div className="flex gap-2 mt-2">
-              <button className="bg-blue-500 text-white px-3 py-1 rounded" onClick={() => setEditing(job)}>Edit</button>
-              <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => handleDelete(job)}>Delete</button>
-              <button className="bg-gray-600 text-white px-3 py-1 rounded" onClick={() => handleViewApplicants(job)}>View Applicants</button>
-            </div>
-            {applicants[job._id] && (
-              <div className="mt-2 border-t pt-2">
-                <div className="font-semibold mb-1">Applicants:</div>
-                <ul className="space-y-1">
-                  {applicants[job._id].length === 0 && <li>No applicants yet.</li>}
-                  {applicants[job._id].map(app => (
-                    <li key={app._id} className="text-sm">
-                      {app.jobSeekerId?.name} ({app.jobSeekerId?.email})<br />
-                      Skills: {app.jobSeekerId?.skills}<br />
-                      {app.jobSeekerId?.resumeURL && <a href={app.jobSeekerId.resumeURL} className="text-blue-600" target="_blank">Resume</a>}
-                    </li>
-                  ))}
-                </ul>
+      {editing && (
+        <div className="glass-panel">
+          <h2 className="section-title">Editing {editing.title}</h2>
+          <JobForm initial={editing} onSave={handleEdit} onCancel={() => setEditing(null)} />
+        </div>
+      )}
+      <section className="glass-panel space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="section-title">Active postings</h2>
+          <span className="subtle">{jobs.length} live</span>
+        </div>
+        {loading && <div className="muted">Loading jobs...</div>}
+        <div className="card-stack">
+          {jobs.map(job => (
+            <div key={job._id} className="card space-y-3">
+              <div className="flex justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="text-lg font-semibold">{job.title}</h3>
+                  <p className="muted text-sm">{job.company} • {job.location}</p>
+                </div>
+                <span className="tag">{job.jobType}</span>
               </div>
-            )}
-          </li>
-        ))}
-      </ul>
-      {!loading && jobs.length === 0 && <div>No jobs posted yet.</div>}
+              <p className="muted text-sm">{job.description?.slice(0, 120)}...</p>
+              <div className="flex flex-wrap gap-2">
+                <button className="btn btn-ghost text-sm" onClick={() => setEditing(job)}>Edit</button>
+                <button className="btn btn-ghost text-sm" onClick={() => handleDelete(job)}>Delete</button>
+                <button className="btn btn-primary text-sm" onClick={() => handleViewApplicants(job)}>View applicants</button>
+              </div>
+              {applicants[job._id] && (
+                <div className="glass-panel bg-[#f8faff]">
+                  <div className="font-semibold mb-2">Applicants</div>
+                  <ul className="space-y-2">
+                    {applicants[job._id].length === 0 && <li className="muted text-sm">No applicants yet.</li>}
+                    {applicants[job._id].map(app => (
+                      <li key={app._id} className="text-sm">
+                        <div className="font-medium">{app.jobSeekerId?.name}</div>
+                        <div className="muted text-xs">{app.jobSeekerId?.email}</div>
+                        <div className="muted text-xs">Skills: {app.jobSeekerId?.skills || "N/A"}</div>
+                        {app.jobSeekerId?.resumeURL && (
+                          <a href={app.jobSeekerId.resumeURL} target="_blank" className="text-blue-600 text-xs" rel="noreferrer">
+                            View resume
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        {!loading && jobs.length === 0 && <div className="muted">No postings yet. Create your first role to see it here.</div>}
+      </section>
     </main>
   );
 }

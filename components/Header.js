@@ -1,53 +1,65 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/utils/apiClient";
+import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/app/providers/AuthProvider";
 
 export default function Header() {
   const { user, signOut } = useAuth() || {};
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    apiFetch("/api/auth/user", { method: "GET" })
-      .then((res) => {
-        if (res.status === 200) {
-          console.log("User data fetched");
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data", error);
-        setLoading(false);
-      });
-  }, []);
 
   return (
-    <header className="w-full flex items-center justify-between px-6 py-3 border-b mb-4">
-      <Link href="/" className="font-bold text-lg">Job Portal</Link>
-      <nav className="flex gap-4 items-center">
-        {!user && <>
-          <Link href="/login" className="text-blue-600">Login</Link>
-          <Link href="/register" className="text-blue-600">Register</Link>
-        </>}
-        {user && <>
-          {/* Dashboard link for jobseeker, employer, or admin */}
-          {(user.role === "jobseeker") && (
-            <Link href="/jobseeker/dashboard" className="text-blue-600">Dashboard</Link>
-          )}
-          {(user.role === "employer") && (
-            <Link href="/employer/dashboard" className="text-blue-600">Dashboard</Link>
-          )}
-          {(user.role === "admin") && (
-            <Link href="/admin/dashboard" className="text-blue-600">Dashboard</Link>
-          )}
-          <Link href="/profile" className="text-gray-700 hover:underline">
-            {user.name} ({user.role})
+    <header className="sticky top-0 z-30 border border-white/50 bg-white/80 backdrop-blur-md shadow-sm rounded-2xl px-6 py-3">
+      <div className="flex items-center justify-between">
+        <Link href="/" className="text-xl font-semibold tracking-tight flex items-center gap-2">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white font-bold">
+            JP
+          </span>
+          Job Portal
+        </Link>
+
+        <nav className="flex items-center gap-3">
+          <Link href="/" className="btn btn-ghost text-sm">
+            Browse Jobs
           </Link>
-          <button className="text-red-600" onClick={signOut}>Logout</button>
-        </>}
-      </nav>
+          {!user && (
+            <>
+              <Link href="/login" className="btn btn-primary text-sm">
+                Login
+              </Link>
+              <Link href="/register" className="btn btn-ghost text-sm">
+                Join Now
+              </Link>
+            </>
+          )}
+          {user && (
+            <>
+              {user.role === "jobseeker" && (
+                <Link href="/jobseeker/dashboard" className="btn btn-ghost text-sm">
+                  Dashboard
+                </Link>
+              )}
+              {user.role === "employer" && (
+                <Link href="/employer/dashboard" className="btn btn-ghost text-sm">
+                  Dashboard
+                </Link>
+              )}
+              {user.role === "admin" && (
+                <Link href="/admin/dashboard" className="btn btn-ghost text-sm">
+                  Dashboard
+                </Link>
+              )}
+              <Link
+                href="/profile"
+                className="subtle hover:opacity-80"
+              >
+                {user.name} ({user.role})
+              </Link>
+              <button className="btn btn-ghost text-sm" onClick={signOut}>
+                Logout
+              </button>
+            </>
+          )}
+        </nav>
+      </div>
     </header>
   );
 }

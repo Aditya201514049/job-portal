@@ -41,22 +41,30 @@ export default function JobDetailsPage() {
     else setApplyMsg(data?.error || "Failed to apply");
   };
 
-  if (loading) return <div className="p-8">Loading...</div>;
-  if (error) return <div className="p-8 text-red-600">{error}</div>;
-  if (!job) return <div className="p-8">Job not found.</div>;
+  if (loading) return <div className="glass-panel">Loading...</div>;
+  if (error) return <div className="glass-panel text-red-600">{error}</div>;
+  if (!job) return <div className="glass-panel">Job not found.</div>;
 
   return (
-    <main className="max-w-xl mx-auto p-6 border rounded mt-8">
-      <h1 className="text-2xl font-bold mb-2">{job.title}</h1>
-      <div className="text-gray-700 mb-1">{job.company} - {job.location}</div>
-      <div className="text-gray-500 mb-1">{job.jobType} | {job.salaryRange}</div>
-      <div className="mb-4 text-sm">{job.description}</div>
-      {user && user.role === "jobseeker" && (
-        <button className="bg-blue-600 text-white py-2 px-4 rounded" onClick={handleApply}>
-          Apply to this job
-        </button>
-      )}
-      {applyMsg && <div className="mt-2 text-green-700">{applyMsg}</div>}
+    <main className="space-y-6">
+      <div className="glass-panel space-y-2">
+        <p className="subtle w-fit">{job.company}</p>
+        <h1 className="text-3xl font-semibold">{job.title}</h1>
+        <div className="flex flex-wrap gap-3 muted text-sm">
+          <span>{job.location}</span>
+          <span className="tag">{job.jobType}</span>
+          <span>{job.salaryRange}</span>
+        </div>
+        <p className="muted mt-4 leading-relaxed">
+          {job.description}
+        </p>
+        {user && user.role === "jobseeker" && (
+          <button className="btn btn-primary mt-4" onClick={handleApply}>
+            Apply to this job
+          </button>
+        )}
+        {applyMsg && <div className="mt-2 text-green-700">{applyMsg}</div>}
+      </div>
     </main>
   );
 }

@@ -4,11 +4,11 @@ import { apiFetch } from "@/lib/utils/apiClient";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const { signIn, user } = useAuth();
+  const { signIn, user } = useAuth() || {};
   const router = useRouter();
 
   useEffect(() => {
@@ -20,33 +20,57 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    const { status, data } = await apiFetch("/api/auth/login", { method: "POST", body: { email, password } });
+    const { status, data } = await apiFetch("/api/auth/login", {
+      method: "POST",
+      body: { email, password },
+    });
+
     if (status === 200 && data?.token) {
-      signIn({ token: data.token, user: data.user });
-      // redirect to home
-      window.location.href = "/";
+      signIn?.({ token: data.token, user: data.user });
+      router.replace("/");
       return;
     }
+
     setError(data?.error || "Login failed");
   };
 
   if (user) {
-    return <div className="max-w-md mx-auto mt-24 p-6 border rounded">Redirecting...</div>;
+    return <div className="glass-panel max-w-md mx-auto mt-12">Redirecting...</div>;
   }
 
   return (
-    <div className="max-w-md mx-auto mt-24 p-6 border rounded">
-      <h2 className="text-xl font-semibold mb-4">Login</h2>
-      <form onSubmit={handleSubmit}>
-        <label className="block mb-2">Email
-          <input className="w-full p-2 border rounded" value={email} onChange={(e)=>setEmail(e.target.value)} />
-        </label>
-        <label className="block mb-2">Password
-          <input type="password" className="w-full p-2 border rounded" value={password} onChange={(e)=>setPassword(e.target.value)} />
-        </label>
-        {error && <div className="text-red-600 mb-2">{error}</div>}
-        <button className="bg-blue-600 text-white py-2 px-4 rounded" type="submit">Login</button>
-      </form>
-    </div>
+    <main className="flex items-center justify-center">
+      <div className="glass-panel w-full max-w-md space-y-5">
+        <div>
+          <p className="subtle">Welcome back</p>
+          <h1 className="text-2xl font-semibold">Sign in to continue</h1>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <label className="block text-sm font-medium">
+            Email
+            <input
+              className="input mt-1"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <label className="block text-sm font-medium">
+            Password
+            <input
+              type="password"
+              className="input mt-1"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          {error && <div className="text-red-600">{error}</div>}
+          <button className="btn btn-primary w-full" type="submit">
+            Login
+          </button>
+        </form>
+      </div>
+    </main>
   );
-}
+};
+
+export default LoginPage;

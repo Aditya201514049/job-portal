@@ -53,69 +53,71 @@ export default function ProfilePage() {
   };
 
   if (!user || !token) {
-    return <main className="max-w-2xl mx-auto p-4">Redirecting...</main>;
+    return <main className="glass-panel">Redirecting...</main>;
   }
 
   if (loading) {
-    return <main className="max-w-2xl mx-auto p-4">Loading profile...</main>;
+    return <main className="glass-panel">Loading profile...</main>;
   }
 
   if (error) {
-    return <main className="max-w-2xl mx-auto p-4 text-red-600">{error}</main>;
+    return <main className="glass-panel text-red-600">{error}</main>;
   }
 
   return (
-    <main className="max-w-2xl mx-auto p-4 space-y-6">
-      <section className="border rounded p-4">
-        <h1 className="text-2xl font-bold mb-4">Profile</h1>
-        <div className="space-y-2 text-sm">
-          <div><span className="font-semibold">Name:</span> {profile?.name}</div>
-          <div><span className="font-semibold">Email:</span> {profile?.email}</div>
-          <div><span className="font-semibold">Role:</span> {profile?.role}</div>
+    <main className="space-y-6">
+      <section className="glass-panel space-y-2">
+        <p className="subtle w-fit">Account overview</p>
+        <h1 className="text-3xl font-semibold">{profile?.name}</h1>
+        <div className="muted">{profile?.email}</div>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <span className="tag">{profile?.role}</span>
           {profile?.role === "employer" && (
-            <div><span className="font-semibold">Approval:</span> {profile?.isApproved ? "Approved" : "Pending"}</div>
+            <span className="tag">
+              {profile?.isApproved ? "Approved" : "Pending approval"}
+            </span>
           )}
-          <div><span className="font-semibold">Status:</span> {profile?.isBlocked ? "Blocked" : "Active"}</div>
+          {profile?.isBlocked && <span className="tag">Blocked</span>}
         </div>
       </section>
 
       {profile?.role === "jobseeker" && (
-        <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-3">Jobseeker Details</h2>
-          <form onSubmit={handleSave} className="space-y-3">
-            <label className="block text-sm">
+        <section className="glass-panel space-y-4">
+          <h2 className="section-title">Jobseeker details</h2>
+          <form onSubmit={handleSave} className="space-y-4">
+            <label className="block text-sm font-medium">
               Bio
               <textarea
                 name="bio"
-                className="w-full border rounded p-2 mt-1"
+                className="input mt-1 h-28 resize-none"
                 value={profile?.bio || ""}
                 onChange={handleChange}
               />
             </label>
-            <label className="block text-sm">
+            <label className="block text-sm font-medium">
               Skills (comma separated)
               <input
                 name="skills"
-                className="w-full border rounded p-2 mt-1"
+                className="input mt-1"
                 value={profile?.skills || ""}
                 onChange={handleChange}
               />
             </label>
-            <label className="block text-sm">
+            <label className="block text-sm font-medium">
               Resume URL
               <input
                 name="resumeURL"
-                className="w-full border rounded p-2 mt-1"
+                className="input mt-1"
                 value={profile?.resumeURL || ""}
                 onChange={handleChange}
               />
             </label>
             <button
               type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded"
+              className="btn btn-primary"
               disabled={saving}
             >
-              {saving ? "Saving..." : "Save"}
+              {saving ? "Saving..." : "Save changes"}
             </button>
             {message && <div className="text-green-700">{message}</div>}
           </form>
