@@ -408,7 +408,7 @@ This project is created for assessment purposes.
 
 ## 👨‍💻 Author
 
-Created as part of a Full Stack Developer assessment task by Adity Singha.
+Created as part of a Full Stack Developer assessment task by Aditya Singha.
 
 ## 🙏 Acknowledgments
 
