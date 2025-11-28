@@ -3,15 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { apiFetch } from "@/lib/utils/apiClient";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { token, user } = useAuth() || {};
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     if (!token) {
@@ -27,30 +26,6 @@ export default function ProfilePage() {
     };
     fetchProfile();
   }, [token, router]);
-
-  const handleChange = (e) => {
-    setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!token) return;
-    setSaving(true);
-    setMessage(null);
-    const body = {
-      bio: profile?.bio || "",
-      skills: profile?.skills || "",
-      resumeURL: profile?.resumeURL || "",
-    };
-    const { status, data } = await apiFetch("/api/profile", {
-      method: "PUT",
-      token,
-      body,
-    });
-    if (status === 200) setMessage("Profile updated successfully.");
-    else setMessage(data?.error || "Failed to update profile.");
-    setSaving(false);
-  };
 
   if (!user || !token) {
     return <main className="glass-panel">Redirecting...</main>;
@@ -83,44 +58,57 @@ export default function ProfilePage() {
 
       {profile?.role === "jobseeker" && (
         <section className="glass-panel space-y-4">
-          <h2 className="section-title">Jobseeker details</h2>
-          <form onSubmit={handleSave} className="space-y-4">
-            <label className="block text-sm font-medium">
-              Bio
-              <textarea
-                name="bio"
-                className="input mt-1 h-28 resize-none"
-                value={profile?.bio || ""}
-                onChange={handleChange}
-              />
-            </label>
-            <label className="block text-sm font-medium">
-              Skills (comma separated)
-              <input
-                name="skills"
-                className="input mt-1"
-                value={profile?.skills || ""}
-                onChange={handleChange}
-              />
-            </label>
-            <label className="block text-sm font-medium">
-              Resume URL
-              <input
-                name="resumeURL"
-                className="input mt-1"
-                value={profile?.resumeURL || ""}
-                onChange={handleChange}
-              />
-            </label>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={saving}
-            >
-              {saving ? "Saving..." : "Save changes"}
-            </button>
-            {message && <div className="text-green-700">{message}</div>}
-          </form>
+          <div className="flex items-center justify-between">
+            <h2 className="section-title">Jobseeker details</h2>
+            <Link href="/jobseeker/dashboard" className="btn btn-ghost text-sm">
+              Edit profile
+            </Link>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Bio</label>
+              <div className="mt-1 p-3 bg-gray-50 rounded border border-gray-200 min-h-[80px]">
+                {profile?.bio ? (
+                  <p className="text-sm text-gray-800 whitespace-pre-wrap">{profile.bio}</p>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">No bio added yet</p>
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Skills</label>
+              <div className="mt-1 p-3 bg-gray-50 rounded border border-gray-200">
+                {profile?.skills ? (
+                  <div className="flex flex-wrap gap-2">
+                    {profile.skills.split(",").map((skill, idx) => (
+                      <span key={idx} className="tag bg-blue-50 text-blue-700 border-blue-200">
+                        {skill.trim()}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">No skills added yet</p>
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Resume URL</label>
+              <div className="mt-1 p-3 bg-gray-50 rounded border border-gray-200">
+                {profile?.resumeURL ? (
+                  <a 
+                    href={profile.resumeURL} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    {profile.resumeURL}
+                  </a>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">No resume URL added yet</p>
+                )}
+              </div>
+            </div>
+          </div>
         </section>
       )}
     </main>
