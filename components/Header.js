@@ -1,10 +1,17 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
 
 export default function Header() {
   const { user, signOut } = useAuth() || {};
+  const router = useRouter();
+
+  const handleLogout = () => {
+    signOut?.();
+    router.push("/login");
+  };
 
   return (
     <header className="sticky top-0 z-30 border border-white/50 bg-white/80 backdrop-blur-md shadow-sm rounded-2xl px-6 py-3">
@@ -53,7 +60,7 @@ export default function Header() {
               >
                 {user.name} ({user.role})
               </Link>
-              <button className="btn btn-ghost text-sm" onClick={signOut}>
+              <button className="btn btn-ghost text-sm" onClick={handleLogout}>
                 Logout
               </button>
             </>
