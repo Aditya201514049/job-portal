@@ -1,4 +1,4 @@
-# Job Portal - Full Stack MERN Application
+# Job Portal - Full Stack MERN/Next Js Application
 
 A modern, full-featured job portal application built with Next.js, MongoDB, Express, and React. This platform connects job seekers with employers through a secure, role-based system with admin oversight.
 
