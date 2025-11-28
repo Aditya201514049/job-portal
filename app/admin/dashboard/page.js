@@ -12,11 +12,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState(null);
 
-  // Guard: Only allow admin
-  if (!user || !token) return <main className="max-w-2xl mx-auto p-4"><div>Loading...</div></main>;
-  if (user.role !== "admin") return <main className="max-w-2xl mx-auto p-4"><div>Unauthorized</div></main>;
-
   useEffect(() => {
+    if (!token) return;
     const fetchData = async () => {
       setLoading(true);
       // Fetch pending employers
@@ -35,6 +32,14 @@ export default function AdminDashboard() {
     };
     fetchData();
   }, [token]);
+
+  if (!user || !token) {
+    return <main className="max-w-2xl mx-auto p-4"><div>Loading...</div></main>;
+  }
+
+  if (user.role !== "admin") {
+    return <main className="max-w-2xl mx-auto p-4"><div>Unauthorized</div></main>;
+  }
 
   const handleApprove = async (employerId) => {
     const res = await apiFetch(`/api/admin/employers/${employerId}?id=${employerId}`, {

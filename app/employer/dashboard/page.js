@@ -58,19 +58,24 @@ export default function EmployerDashboard() {
   const [msg, setMsg] = useState(null);
   const [applicants, setApplicants] = useState({});
 
-  // Guard: Wait for user and token to load
-  if (!user || !token) {
-    return <main className="max-w-2xl mx-auto p-4"><div>Loading...</div></main>;
-  }
+  const safeJobs = Array.isArray(jobs) ? jobs.filter(Boolean) : [];
 
   const fetchJobs = async () => {
     setLoading(true);
     const { data, ok } = await apiFetch("/api/employer/jobs", { token });
-    if (ok && Array.isArray(data)) setJobs(data);
+    if (ok && Array.isArray(data)) setJobs(data.filter(Boolean));
+    else setJobs([]);
     setLoading(false);
   };
 
-  useEffect(() => { if (token) fetchJobs(); }, [token]);
+  useEffect(() => {
+    if (!token) return;
+    fetchJobs();
+  }, [token]);
+
+  if (!user || !token) {
+    return <main className="max-w-2xl mx-auto p-4"><div>Loading...</div></main>;
+  }
 
   const handleCreate = async (form) => {
     const { status, data } = await apiFetch("/api/jobs", { method: "POST", token, body: form });
@@ -82,7 +87,9 @@ export default function EmployerDashboard() {
   };
 
   const handleEdit = async (form) => {
-    const { status, data } = await apiFetch(`/api/jobs/${editing._id}?id=${editing._id}`, { method: "PUT", token, body: form });
+    if (!editing?._id) return;
+    const jobId = editing._id;
+    const { status, data } = await apiFetch(`/api/jobs/${jobId}?id=${jobId}`, { method: "PUT", token, body: form });
     if (status === 200) {
       setMsg("Job updated!");
       setEditing(null);
@@ -91,8 +98,10 @@ export default function EmployerDashboard() {
   };
 
   const handleDelete = async (job) => {
+    if (!job?._id) return;
     if (!window.confirm("Delete this job?")) return;
-    const { status, data } = await apiFetch(`/api/jobs/${job._id}?id=${job._id}`, { method: "DELETE", token });
+    const jobId = job._id;
+    const { status, data } = await apiFetch(`/api/jobs/${jobId}?id=${jobId}`, { method: "DELETE", token });
     if (status === 200) {
       setMsg("Job deleted.");
       fetchJobs();
@@ -100,6 +109,7 @@ export default function EmployerDashboard() {
   };
 
   const handleViewApplicants = async (job) => {
+    if (!job?._id) return;
     const { data, ok } = await apiFetch(`/api/employer/applicants?jobId=${job._id}`, { token });
     if (ok && Array.isArray(data)) setApplicants(a => ({ ...a, [job._id]: data }));
     else setApplicants(a => ({ ...a, [job._id]: [] }));
@@ -127,12 +137,12 @@ export default function EmployerDashboard() {
       <section className="glass-panel space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="section-title">Active postings</h2>
-          <span className="subtle">{jobs.length} live</span>
+          <span className="subtle">{safeJobs.length} live</span>
         </div>
         {loading && <div className="muted">Loading jobs...</div>}
         <div className="card-stack">
-          {jobs.map(job => (
-            <div key={job._id} className="card space-y-3">
+          {safeJobs.map((job, idx) => (
+            <div key={job?._id || idx} className="card space-y-3">
               <div className="flex justify-between flex-wrap gap-3">
                 <div>
                   <h3 className="text-lg font-semibold">{job.title}</h3>
@@ -146,7 +156,7 @@ export default function EmployerDashboard() {
                 <button className="btn btn-ghost text-sm" onClick={() => handleDelete(job)}>Delete</button>
                 <button className="btn btn-primary text-sm" onClick={() => handleViewApplicants(job)}>View applicants</button>
               </div>
-              {applicants[job._id] && (
+              {job?._id && applicants[job._id] && (
                 <div className="glass-panel bg-[#f8faff]">
                   <div className="font-semibold mb-2">Applicants</div>
                   <ul className="space-y-2">
