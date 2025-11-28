@@ -69,12 +69,46 @@ export default function EmployerDashboard() {
   };
 
   useEffect(() => {
-    if (!token) return;
-    fetchJobs();
-  }, [token]);
+    if (!token || !user) return;
+    // Only fetch jobs if employer is approved
+    if (user.isApproved) {
+      fetchJobs();
+    } else {
+      setLoading(false);
+    }
+  }, [token, user]);
 
   if (!user || !token) {
     return <main className="max-w-2xl mx-auto p-4"><div>Loading...</div></main>;
+  }
+
+  // Show pending approval message if employer is not approved
+  if (user.role === "employer" && !user.isApproved) {
+    return (
+      <main className="space-y-8">
+        <section className="glass-panel">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-semibold text-yellow-800 mb-1">Account Pending Approval</h3>
+                <p className="text-yellow-700">
+                  Your account is pending approval by the admin. Once approved, you'll be able to create job postings and manage applicants.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="glass-panel space-y-2">
+          <h1 className="text-2xl font-bold">Employer Workspace</h1>
+          <p className="muted">You'll have access to all features once your account is approved.</p>
+        </section>
+      </main>
+    );
   }
 
   const handleCreate = async (form) => {
@@ -120,20 +154,23 @@ export default function EmployerDashboard() {
       <section className="glass-panel flex flex-col gap-3">
         <h1 className="text-2xl font-bold">Employer Workspace</h1>
         <p className="muted">Create openings, manage applicants, and keep your listings up to date.</p>
-        <div className="flex gap-3 flex-wrap">
-          <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); setEditing(null); }}>
-            {showForm ? "Close form" : "Create new job"}
-          </button>
-          {msg && <span className="subtle">{msg}</span>}
-        </div>
+        {user.isApproved && (
+          <div className="flex gap-3 flex-wrap">
+            <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); setEditing(null); }}>
+              {showForm ? "Close form" : "Create new job"}
+            </button>
+            {msg && <span className="subtle">{msg}</span>}
+          </div>
+        )}
       </section>
-      {showForm && <JobForm onSave={handleCreate} onCancel={() => setShowForm(false)} />}
-      {editing && (
+      {user.isApproved && showForm && <JobForm onSave={handleCreate} onCancel={() => setShowForm(false)} />}
+      {user.isApproved && editing && (
         <div className="glass-panel">
           <h2 className="section-title">Editing {editing.title}</h2>
           <JobForm initial={editing} onSave={handleEdit} onCancel={() => setEditing(null)} />
         </div>
       )}
+      {user.isApproved && (
       <section className="glass-panel space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="section-title">Active postings</h2>
@@ -181,6 +218,7 @@ export default function EmployerDashboard() {
         </div>
         {!loading && jobs.length === 0 && <div className="muted">No postings yet. Create your first role to see it here.</div>}
       </section>
+      )}
     </main>
   );
 }
