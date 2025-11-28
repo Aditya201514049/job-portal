@@ -42,7 +42,9 @@ export default function Header() {
           {(user.role === "admin") && (
             <Link href="/admin/dashboard" className="text-blue-600">Dashboard</Link>
           )}
-          <span className="text-gray-700">{user.name} ({user.role})</span>
+          <Link href="/profile" className="text-gray-700 hover:underline">
+            {user.name} ({user.role})
+          </Link>
           <button className="text-red-600" onClick={signOut}>Logout</button>
         </>}
       </nav>
