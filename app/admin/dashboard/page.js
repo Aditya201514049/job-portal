@@ -92,22 +92,19 @@ export default function AdminDashboard() {
         <div className="glass-panel">
           <h2 className="section-title">Platform snapshot</h2>
           <div className="grid grid-cols-2 gap-3">
-            <div className="card">
-              <div className="muted text-sm">Users</div>
-              <div className="text-2xl font-semibold">{users.length}</div>
-            </div>
-            <div className="card">
-              <div className="muted text-sm">Jobs</div>
-              <div className="text-2xl font-semibold">{jobs.length}</div>
-            </div>
-            <div className="card">
-              <div className="muted text-sm">Applications</div>
-              <div className="text-2xl font-semibold">{applications.length}</div>
-            </div>
-            <div className="card">
-              <div className="muted text-sm">Employers pending</div>
-              <div className="text-2xl font-semibold">{pendingEmployers.length}</div>
-            </div>
+            {[
+              { label: "Users", value: users.length },
+              { label: "Jobs", value: jobs.length },
+              { label: "Applications", value: applications.length },
+              { label: "Employers pending", value: pendingEmployers.length },
+            ].map(stat => (
+              <div key={stat.label} className="card">
+                <div className="muted text-sm">{stat.label}</div>
+                <div className="text-2xl font-semibold">
+                  {loading ? <span className="opacity-60">...</span> : stat.value}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
