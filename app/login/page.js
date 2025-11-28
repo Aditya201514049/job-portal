@@ -1,13 +1,21 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/utils/apiClient";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/");
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,6 +29,10 @@ export default function LoginPage() {
     }
     setError(data?.error || "Login failed");
   };
+
+  if (user) {
+    return <div className="max-w-md mx-auto mt-24 p-6 border rounded">Redirecting...</div>;
+  }
 
   return (
     <div className="max-w-md mx-auto mt-24 p-6 border rounded">
