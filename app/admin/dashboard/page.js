@@ -69,6 +69,26 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleBlockUnblock = async (userId) => {
+    // Prevent admin from blocking themselves
+    if (userId === user.id || userId === user._id) {
+      setMsg("You cannot block yourself.");
+      return;
+    }
+
+    const res = await apiFetch(`/api/admin/users?id=${userId}`, {
+      method: "PUT",
+      token,
+    });
+    if (res.status === 200) {
+      const updatedUser = res.data.user;
+      setUsers(users.map(u => u._id === userId ? updatedUser : u));
+      setMsg(res.data.message || `User ${updatedUser.isBlocked ? "blocked" : "unblocked"}`);
+    } else {
+      setMsg(res.data?.error || "Failed to update user");
+    }
+  };
+
   return (
     <main className="space-y-8">
       <section className="glass-panel">
@@ -118,12 +138,24 @@ export default function AdminDashboard() {
         <h2 className="section-title">All users</h2>
         <div className="card-stack">
           {users.map(u => (
-            <div key={u._id} className="card flex items-center justify-between">
-              <div>
+            <div key={u._id} className="card flex items-center justify-between flex-wrap gap-3">
+              <div className="flex-1">
                 <div className="font-semibold">{u.name}</div>
                 <div className="muted text-sm">{u.email}</div>
               </div>
-              <span className="tag">{u.role}{u.isBlocked ? " • blocked" : ""}</span>
+              <div className="flex items-center gap-2">
+                <span className={`tag ${u.isBlocked ? "bg-red-50 text-red-700 border-red-200" : ""}`}>
+                  {u.role}{u.isBlocked ? " • blocked" : ""}
+                </span>
+                {(u._id !== user.id && u._id !== user._id) && (
+                  <button
+                    className={`btn text-sm ${u.isBlocked ? "btn-ghost" : "btn-ghost text-red-600"}`}
+                    onClick={() => handleBlockUnblock(u._id)}
+                  >
+                    {u.isBlocked ? "Unblock" : "Block"}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
           {users.length === 0 && <p className="muted">No users yet.</p>}
